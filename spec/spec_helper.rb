@@ -1,5 +1,5 @@
 def fixtures_path
-  File.expand_path '../fixtures', __FILE__
+  File.expand_path 'fixtures', __dir__
 end
 
-require File.expand_path '../../lib/codice_fiscale', __FILE__
+require File.expand_path '../lib/codice_fiscale', __dir__

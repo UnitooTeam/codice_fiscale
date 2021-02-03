@@ -24,12 +24,13 @@ module CodiceFiscale
       surname: 0..2,
       name: 3..5,
       birthdate: 6..10,
-      gender: 10..11
-    }
+      gender: 9..10,
+      birthplace: 11..14,
 
-    YEAR = 6..7
-    MONTH = 8..8
-    DATE = 9..10
+      year: 6..7,
+      month: 8..8,
+      day: 9..10
+    }
 
     def month_letter(month_number)
       month_number <= 0 ? nil : MONTH_CODES[month_number - 1]

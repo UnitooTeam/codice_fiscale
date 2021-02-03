@@ -7,7 +7,7 @@ describe CodiceFiscale::Alphabet do
     end
 
     it 'consists only of upcased letters' do
-      expect(subject.letters.join).to match /^[A-Z]{1,}$/
+      expect(subject.letters.join).to match(/^[A-Z]{1,}$/)
     end
   end
 
@@ -17,7 +17,7 @@ describe CodiceFiscale::Alphabet do
     end
 
     it 'consists only of upcased letters' do
-      expect(subject.vowels.join).to match /^[A-Z]{1,}$/
+      expect(subject.vowels.join).to match(/^[A-Z]{1,}$/)
     end
   end
 
@@ -27,7 +27,7 @@ describe CodiceFiscale::Alphabet do
     end
 
     it 'consists only of upcased letters' do
-      expect(subject.vowels.join).to match /^[A-Z]{1,}$/
+      expect(subject.vowels.join).to match(/^[A-Z]{1,}$/)
     end
   end
 end

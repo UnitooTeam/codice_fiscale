@@ -6,11 +6,11 @@ module CodiceFiscale
     attr_accessor :italian_citizen
     alias citizen italian_citizen
 
-    delegate :name, :surname, :birthdate, :city_name, :province_code, :country_name, to: :citizen
+    CITIZEN_ATTRIBUTES = %i[name surname year birthdate city_name province_code country_name gender birthplace]
 
     def initialize(arg)
       if arg.instance_of? ItalianCitizen
-        @italian_citizen = italian_citizen
+        @italian_citizen = arg
 
         calculate
       else
@@ -19,10 +19,14 @@ module CodiceFiscale
     end
 
     def method_missing(m, *args, &block)
-      if m.start_with?('extract_') &&
-         (parts = m.split('_')) &&
-         Codes::PARTS.key?(parts.last.to_sym)
-        extract(m)
+      if m.to_s.start_with?('extract_') &&
+         ((parts = m.to_s.split('_')) &&
+         Codes::PARTS.key?(parts.last.to_sym))
+        extract(parts.last)
+      elsif (parts = m.to_s.split('=')) && CITIZEN_ATTRIBUTES.include?(parts.first.to_sym)
+        citizen.send("#{parts.last}=", args.first)
+
+        calculate
       else
         super
       end
@@ -33,35 +37,7 @@ module CodiceFiscale
     end
 
     def calculate
-      @code ||= ((@code = surname_part + name_part + birthdate_part + birthplace_part) + control_character(@code))
-    end
-
-    def surname_part
-      first_three_consonants_than_vowels surname
-    end
-
-    def name_part
-      return "#{consonants_of_name[0]}#{consonants_of_name[2..3]}" if consonants_of_name.size >= 4
-
-      first_three_consonants_than_vowels name
-    end
-
-    def birthdate_part
-      code = birthdate.year.to_s[2..3]
-      code << Codes.month_letter(birthdate.month)
-      code << day_part
-    end
-
-    def day_part
-      number = citizen.female? ? birthdate.day + 40 : birthdate.day
-      number.to_s.rjust(2, '0')
-    end
-
-    def birthplace_part
-      code = citizen.born_in_italy? && Codes.city(city_name, province_code) || Codes.country(country_name)
-      raise "Cannot find a valid code for #{[country_name, city_name, province_code].compact.join ', '}" unless code
-
-      code
+      (@code = surname_part + name_part + birthdate_part + birthplace_part) + control_character(@code)
     end
 
     def control_character(partial_fiscal_code)
@@ -73,21 +49,60 @@ module CodiceFiscale
     end
 
     def consonants_of_name
-      consonants name.upcase
+      consonants citizen.name.upcase
     end
 
     private
 
+    def surname_part
+      first_three_consonants_than_vowels citizen.surname
+    end
+
+    def name_part
+      return "#{consonants_of_name[0]}#{consonants_of_name[2..3]}" if consonants_of_name.size >= 4
+
+      first_three_consonants_than_vowels citizen.name
+    end
+
+    def birthdate_part
+      code = citizen.birthdate.year.to_s[2..3]
+      code << Codes.month_letter(citizen.birthdate.month)
+      code << day_part
+    end
+
+    def day_part
+      number = citizen.female? ? citizen.birthdate.day + 40 : citizen.birthdate.day
+      number.to_s.rjust(2, '0')
+    end
+
+    def birthplace_part
+      code = citizen.born_in_italy? && Codes.city(citizen.city_name,
+                                                  citizen.province_code) || Codes.country(citizen.country_name)
+      unless code
+        raise "Cannot find a valid code for #{[citizen.country_name, citizen.city_name,
+                                               citizen.province_code].compact.join ', '}"
+      end
+
+      code
+    end
+
     def extract(part)
+      calculate if @italian_citizen
+
       part = part.to_sym
 
       case part
+      when :surname, :name, :year, :month, :day, :gender, :birthplace
+        @code[Codes::PARTS[part]]
       when :birthdate
-        raw_birthdate = @code[Codes::PARTS[part]]
-
-        year = raw_birthdate[Codes::YEAR]
-        month = Codes::MONTH_CODES.find_index(raw_birthdate[Codes::MONTH] + 1)
-        day = raw_birthdate[Codes::DATE]
+        year = @code.slice(Codes::YEAR).to_i
+        year = if year < 21
+                 2000 + year
+               else
+                 1900 + year
+               end
+        month = Codes::MONTH_CODES.find_index(@code.slice(Codes::MONTH)) + 1
+        day = @code.slice(Codes::DATE).to_i
         day -= 40 if day >= 41
 
         Date.new(year, month, day)
