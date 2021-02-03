@@ -106,6 +106,16 @@ describe CodiceFiscale::FiscalCode do
         it('is the birth day + 40') { expect(fiscal_code.extract_day).to eq '43' }
       end
     end
+
+    describe 'extract Date' do
+      it 'should be an instance of Date' do
+        expect(fiscal_code.extract_birthdate).to be_a Date
+      end
+
+      it 'should be 1983-05-03' do
+        expect(fiscal_code.extract_birthdate.strftime('%Y-%m-%d')).to eq '1983-05-03'
+      end
+    end
   end
 
   describe '#birthplace_part' do

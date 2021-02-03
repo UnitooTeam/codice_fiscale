@@ -95,14 +95,14 @@ module CodiceFiscale
       when :surname, :name, :year, :month, :day, :gender, :birthplace
         @code[Codes::PARTS[part]]
       when :birthdate
-        year = @code.slice(Codes::YEAR).to_i
+        year = @code.slice(Codes::PARTS[:year]).to_i
         year = if year < 21
                  2000 + year
                else
                  1900 + year
                end
-        month = Codes::MONTH_CODES.find_index(@code.slice(Codes::MONTH)) + 1
-        day = @code.slice(Codes::DATE).to_i
+        month = Codes::MONTH_CODES.find_index(@code.slice(Codes::PARTS[:month])) + 1
+        day = @code.slice(Codes::PARTS[:day]).to_i
         day -= 40 if day >= 41
 
         Date.new(year, month, day)
