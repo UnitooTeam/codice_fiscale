@@ -1,0 +1,52 @@
+require: rubocop-rails
+
+AllCops:
+  TargetRubyVersion: 2.6
+
+Layout/LineLength:
+  Enabled: true
+  Max: 100
+  AutoCorrect: true
+
+Layout/MultilineArrayLineBreaks:
+  Enabled: true
+
+Layout/MultilineBlockLayout:
+  Enabled: true
+
+Layout/MultilineHashKeyLineBreaks:
+  Enabled: true
+
+Layout/MultilineMethodArgumentLineBreaks:
+  Enabled: true
+
+Layout/MultilineMethodCallIndentation:
+  Enabled: true
+  EnforcedStyle: indented_relative_to_receiver
+
+Layout/ParameterAlignment:
+  Enabled: true
+  EnforcedStyle: with_first_parameter
+
+Layout/ArgumentAlignment:
+  Enabled: true
+
+Layout/HashAlignment:
+  Enabled: true
+
+Layout/ArrayAlignment:
+  Enabled: true
+
+Layout/FirstParameterIndentation:
+  Enabled: true
+
+Style/MultilineMemoization:
+  Enabled: true
+
+Style/MultipleComparison:
+  Enabled: true
+  AutoCorrect: true
+
+Style/MultilineBlockChain:
+  Enabled: true
+  AutoCorrect: true
