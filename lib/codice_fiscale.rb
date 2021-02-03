@@ -22,7 +22,7 @@ module CodiceFiscale
   end
 
   def self.extract_from(fiscal_code, part_to_extract)
-    unless Codes.PARTS.includes?(part_to_extract)
+    unless Codes::PARTS.includes?(part_to_extract)
       raise ArgumentError, "Cannot extract #{part_to_extract} from fiscal code"
     end
 
